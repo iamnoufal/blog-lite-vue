@@ -44,23 +44,28 @@ const Home = {
     }
   },
   beforeCreate: function() {
-    fetch('http://127.0.0.1:5000/api/auth', {credentials: 'include'})
-      .then(res => {
-        console.log(res)
-        switch (res.status) {
-          case 200:
-            res.json().then(posts => this.posts = posts.posts)
-            break;
-          case 400:
-            res.text().then(msg => alert(msg))
-            this.$router.push('login')
-            break;
-          case 401:
-            res.text().then(msg => alert(msg))
-            this.$router.push('login')
-            break;
-        }
-      })
+    cookieStore.get("Token").then(token => {
+      if (token == '0') {
+        this.$router.push('/verify')
+      } else {
+        fetch('http://127.0.0.1:5000/api/auth', {credentials: 'include'})
+          .then(res => {
+            switch (res.status) {
+              case 200:
+                res.json().then(posts => this.posts = posts.posts)
+                break;
+              case 400:
+                res.text().then(msg => alert(msg))
+                this.$router.push('login')
+                break;
+              case 401:
+                res.text().then(msg => alert(msg))
+                this.$router.push('login')
+                break;
+            }
+          })
+      }
+    }).catch(err => this.$router.push('/login'))
   },
   methods: {
     logout: function() {

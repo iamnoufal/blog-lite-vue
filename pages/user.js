@@ -84,74 +84,80 @@ const User = {
     }
   },
   beforeCreate: function() {
-    cookieStore.get('User').then(data => {
-      if (data != null && data.value == this.$route.params.user_id) {
-        this.$router.push('/profile')
+    cookieStore.get("Token").then(token => {
+      if (token == '0') {
+        this.$router.push('/verify')
       } else {
-        fetch('http://127.0.0.1:5000/api/user/'+this.$route.params.user_id)
-          .then(res => {
-            switch (res.status) {
-              case 200:
-                res.json().then(data => {
-                  this.created_on = data.created_on
-                  this.email = data.email
-                  this.followers_list = data.followers_list
-                  this.following_list = data.following_list
-                  this.last_login = data.last_login
-                  this.name = data.name
-                  this.posts = data.posts
-                  this.user_id = data.user_id
-                  this.image = data.image
-                  this.about = data.about
+        cookieStore.get('User').then(data => {
+          if (data != null && data.value == this.$route.params.user_id) {
+            this.$router.push('/profile')
+          } else {
+            fetch('http://127.0.0.1:5000/api/user/'+this.$route.params.user_id)
+              .then(res => {
+                switch (res.status) {
+                  case 200:
+                    res.json().then(data => {
+                      this.created_on = data.created_on
+                      this.email = data.email
+                      this.followers_list = data.followers_list
+                      this.following_list = data.following_list
+                      this.last_login = data.last_login
+                      this.name = data.name
+                      this.posts = data.posts
+                      this.user_id = data.user_id
+                      this.image = data.image
+                      this.about = data.about
+                    })
+                    break;
+                  case 400:
+                    res.text().then(msg => alert(msg))
+                    break;
+                  case 401:
+                    res.text().then(msg => alert(msg))
+                    break;
+                }
+              })
+              .then(() => {
+                cookieStore.get("User").then(user_id => {
+                  fetch('http://127.0.0.1:5000/api/profile', {credentials: 'include'})
+                    .then(res => {
+                      switch (res.status) {
+                        case 200:
+                          res.json().then(data => {
+                            let default_user_followers = []
+                            for (let i of data.following_list) {
+                              default_user_followers.push(JSON.stringify(i))
+                            }
+                            if (default_user_followers.indexOf(JSON.stringify({
+                              'user_id': this.user_id,
+                              'name': this.name,
+                              'email': this.email
+                            })) != -1) {
+                              this.following = true
+                            }
+                            for (let i of this.followers_list) {
+                              if (default_user_followers.indexOf(JSON.stringify(i)) != -1) {
+                                i['following'] = true
+                              } else {
+                                i['following'] = false
+                              }
+                            }
+                            for (let i of this.following_list) {
+                              if (default_user_followers.indexOf(JSON.stringify(i)) != -1) {
+                                i['following'] = true
+                              } else {
+                                i['following'] = false
+                              }
+                            }
+                          })
+                      }
+                    })
                 })
-                break;
-              case 400:
-                res.text().then(msg => alert(msg))
-                break;
-              case 401:
-                res.text().then(msg => alert(msg))
-                break;
-            }
-          })
-          .then(() => {
-            cookieStore.get("User").then(user_id => {
-              fetch('http://127.0.0.1:5000/api/profile', {credentials: 'include'})
-                .then(res => {
-                  switch (res.status) {
-                    case 200:
-                      res.json().then(data => {
-                        let default_user_followers = []
-                        for (let i of data.following_list) {
-                          default_user_followers.push(JSON.stringify(i))
-                        }
-                        if (default_user_followers.indexOf(JSON.stringify({
-                          'user_id': this.user_id,
-                          'name': this.name,
-                          'email': this.email
-                        })) != -1) {
-                          this.following = true
-                        }
-                        for (let i of this.followers_list) {
-                          if (default_user_followers.indexOf(JSON.stringify(i)) != -1) {
-                            i['following'] = true
-                          } else {
-                            i['following'] = false
-                          }
-                        }
-                        for (let i of this.following_list) {
-                          if (default_user_followers.indexOf(JSON.stringify(i)) != -1) {
-                            i['following'] = true
-                          } else {
-                            i['following'] = false
-                          }
-                        }
-                      })
-                  }
-                })
-            })
-          })
+              })
+          }
+        })
       }
-    })
+    }).catch(err => this.$router.push('/login'))
   },
   created: function() {
     try {

@@ -126,31 +126,37 @@ const Profile = {
     }
   },
   beforeCreate: function() {
-    fetch('http://127.0.0.1:5000/api/profile', {credentials: 'include'})
-      .then(res => {
-        switch (res.status) {
-          case 200:
-            res.json().then(data => {
-              this.created_on = data.created_on
-              this.email = data.email
-              this.followers_list = data.followers_list
-              this.following_list = data.following_list
-              this.last_login = data.last_login
-              this.name = data.name
-              this.posts = data.posts
-              this.user_id = data.user_id
-              this.image = data.image
-              this.about = data.about
-            })
-            break;
-          case 400:
-            res.text().then(msg => alert(msg))
-            break;
-          case 401:
-            res.text().then(msg => alert(msg))
-            break;
-        }
-      })
+    cookieStore.get("Token").then(token => {
+      if (token == '0') {
+        this.$router.push('/verify')
+      } else {
+        fetch('http://127.0.0.1:5000/api/profile', {credentials: 'include'})
+          .then(res => {
+            switch (res.status) {
+              case 200:
+                res.json().then(data => {
+                  this.created_on = data.created_on
+                  this.email = data.email
+                  this.followers_list = data.followers_list
+                  this.following_list = data.following_list
+                  this.last_login = data.last_login
+                  this.name = data.name
+                  this.posts = data.posts
+                  this.user_id = data.user_id
+                  this.image = data.image
+                  this.about = data.about
+                })
+                break;
+              case 400:
+                res.text().then(msg => alert(msg))
+                break;
+              case 401:
+                res.text().then(msg => alert(msg))
+                break;
+            }
+          })
+      }
+    }).catch(err => this.$router.push('/login'))
   },
   methods: {
     fetchData: function() {

@@ -95,9 +95,9 @@ const SignUp = {
           switch (res.status) {
             case 200:
               res.json().then(token => {
-                document.cookie = "Token="+token.replaceAll('"', '')
+                document.cookie = "Token=0"
                 document.cookie = "User="+this.user_id
-                this.$router.push('/')
+                this.$router.push('/verify')
               })
               break
             case 400:
