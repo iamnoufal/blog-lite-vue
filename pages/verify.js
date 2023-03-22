@@ -17,7 +17,7 @@ const Verify = {
   },
   beforeCreate: function() {
     cookieStore.get("User").then(user_id => {
-      fetch(`http://127.0.0.1:5000/api/${user_id}/verify`).then(res => {
+      fetch(`http://127.0.0.1:5000/api/${user_id.value}/verify`).then(res => {
         switch(res.status) {
           case 200:
             res.text().then(msg => {
@@ -27,7 +27,7 @@ const Verify = {
               }
             })
           case 400:
-            res.text().then(msg => alert(msg)).then(() => this.$router.push('/login'))
+            res.text().then(msg => this.error = msg).then(() => this.$router.push('/login'))
         }
       })
     })
@@ -35,7 +35,7 @@ const Verify = {
   methods: {
     verify: function() {
       cookieStore.get('User').then(user_id => {
-        fetch('http://127.0.0.1:5000/api/'+user_id+'/verify', {
+        fetch('http://127.0.0.1:5000/api/'+user_id.value+'/verify', {
           method: "POST",
           body: JSON.stringify({otp: this.otp}),
           credentials: 'include',
@@ -43,9 +43,9 @@ const Verify = {
             'Content-Type': 'application/json'
           }
         }).then(res => {
-          switch(res) {
+          switch(res.status) {
             case 200:
-              res.text().then(token = document.cookie = "Token="+token).then(() => this.$router.push("/"))
+              res.text().then(token => document.cookie = "Token="+token).then(() => this.$router.push("/"))
             case 400:
               res.text().then(msg => this.error = msg).then(() => this.$router.push("/signup"))
           }

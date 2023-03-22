@@ -18,6 +18,10 @@ const routes = [
   {
     path: '/user/:user_id',
     component: User
+  },
+  {
+    path: "/verify",
+    component: Verify
   }
 ]
 

@@ -85,7 +85,7 @@ const User = {
   },
   beforeCreate: function() {
     cookieStore.get("Token").then(token => {
-      if (token == '0') {
+      if (token.value == '0') {
         this.$router.push('/verify')
       } else {
         cookieStore.get('User').then(data => {

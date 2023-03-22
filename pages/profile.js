@@ -127,7 +127,7 @@ const Profile = {
   },
   beforeCreate: function() {
     cookieStore.get("Token").then(token => {
-      if (token == '0') {
+      if (token.value == '0') {
         this.$router.push('/verify')
       } else {
         fetch('http://127.0.0.1:5000/api/profile', {credentials: 'include'})
