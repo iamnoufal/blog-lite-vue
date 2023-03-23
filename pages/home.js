@@ -36,6 +36,7 @@ const Home = {
       </div>
     </div>
     <upload-post />
+    <search />
   </div>
   `,
   data: function() {
@@ -75,6 +76,7 @@ const Home = {
   },
   components: {
     'upload-post': () => import('../components/upload-post.js'),
-    'navigation': () => import ('../components/navigation.js')
+    'navigation': () => import ('../components/navigation.js'),
+    'search': () => import('../components/search.js'),
   }
 }

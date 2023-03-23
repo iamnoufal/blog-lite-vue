@@ -18,8 +18,8 @@ export default Vue.component('user-list', {
                   <small>{{ i.user_id }}</small>
                 </div>
               </router-link>
-              <button style="z-index:4000" class="btn btn-dark" v-if='i.following' disabled>Unfollow</button>
-              <button style="z-index:4000" type='button' v-else class="btn btn-primary" @click='follow'>Follow</button>
+              <button style="z-index:4000" class="btn btn-outline-dark" v-if='i.following' @click="unfollow(i.user_id, i.name)">Unfollow</button>
+              <button style="z-index:4000" type='button' v-else class="btn btn-primary" @click='follow(i.user_id, i.name)'>Follow</button>
             </div>
           </div>
         </div>

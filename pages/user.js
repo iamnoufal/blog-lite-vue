@@ -16,7 +16,7 @@ const User = {
             <a href="#" class="text-black" data-bs-toggle="modal" data-bs-target="#Followers">{{ followers_list.length }} followers</a>
             <a href="#" class="text-black ms-3" data-bs-toggle="modal" data-bs-target="#Following">{{ following_list.length }} following</a>
           </div>
-          <button class="btn btn-outline-primary" v-if='following' @click="unfollow(user_id, name)">Unfollow</button>
+          <button class="btn btn-outline-dark" v-if='following' @click="unfollow(user_id, name)">Unfollow</button>
           <button class="btn btn-primary" v-else @click='follow(user_id, name)'>Follow</button>
         </div>
       </div>
@@ -125,6 +125,8 @@ const User = {
                         case 200:
                           res.json().then(data => {
                             let default_user_followers = []
+                            let followers = []
+                            let following = []
                             for (let i of data.following_list) {
                               default_user_followers.push(JSON.stringify(i))
                             }
@@ -141,6 +143,7 @@ const User = {
                               } else {
                                 i['following'] = false
                               }
+                              followers.push(i)
                             }
                             for (let i of this.following_list) {
                               if (default_user_followers.indexOf(JSON.stringify(i)) != -1) {
@@ -148,8 +151,12 @@ const User = {
                               } else {
                                 i['following'] = false
                               }
+                              following.push(i)
                             }
+                            this.followers_list = followers
+                            this.following_list = following
                           })
+                          break;
                       }
                     })
                 })

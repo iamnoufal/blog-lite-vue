@@ -20,14 +20,16 @@ const Verify = {
       fetch(`http://127.0.0.1:5000/api/${user_id.value}/verify`).then(res => {
         switch(res.status) {
           case 200:
-            res.text().then(msg => {
-              if (msg == 'User already verified') {
+            res.text().then(msg => { 
+              if (msg != "") {
                 alert(msg)
-                this.$router.pop()
+                this.$router.back()
               }
             })
+            break;
           case 400:
             res.text().then(msg => this.error = msg).then(() => this.$router.push('/login'))
+            break;
         }
       })
     })
@@ -45,7 +47,7 @@ const Verify = {
         }).then(res => {
           switch(res.status) {
             case 200:
-              res.text().then(token => document.cookie = "Token="+token).then(() => this.$router.push("/"))
+              res.text().then(token => document.cookie = "Token="+token.replaceAll('"', '')).then(() => this.$router.push("/"))
             case 400:
               res.text().then(msg => this.error = msg).then(() => this.$router.push("/signup"))
           }

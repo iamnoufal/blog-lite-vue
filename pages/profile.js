@@ -155,6 +155,50 @@ const Profile = {
                 break;
             }
           })
+          .then(() => {
+            cookieStore.get("User").then(user_id => {
+              fetch('http://127.0.0.1:5000/api/profile', {credentials: 'include'})
+                .then(res => {
+                  switch (res.status) {
+                    case 200:
+                      res.json().then(data => {
+                        let default_user_followers = []
+                        let followers = []
+                        let following = []
+                        for (let i of data.following_list) {
+                          default_user_followers.push(JSON.stringify(i))
+                        }
+                        if (default_user_followers.indexOf(JSON.stringify({
+                          'user_id': this.user_id,
+                          'name': this.name,
+                          'email': this.email
+                        })) != -1) {
+                          this.following = true
+                        }
+                        for (let i of this.followers_list) {
+                          if (default_user_followers.indexOf(JSON.stringify(i)) != -1) {
+                            i['following'] = true
+                          } else {
+                            i['following'] = false
+                          }
+                          followers.push(i)
+                        }
+                        for (let i of this.following_list) {
+                          if (default_user_followers.indexOf(JSON.stringify(i)) != -1) {
+                            i['following'] = true
+                          } else {
+                            i['following'] = false
+                          }
+                          following.push(i)
+                        }
+                        this.followers_list = followers
+                        this.following_list = following
+                      })
+                      break;
+                  }
+                })
+            })
+          })
       }
     }).catch(err => this.$router.push('/login'))
   },
