@@ -32,8 +32,7 @@ export default Vue.component('search', {
   },
   watch: {
     search(a, b) {
-      fetch('http://127.0.0.1:5000/api/search/'+this.search)
-        .then(res => {console.log(res);res.json().then(res => this.users = res['users'])})
+      fetch('http://127.0.0.1:5000/api/search/'+this.search).then(res => res.json().then(res => this.users = res['users']))
     }
   }
 })

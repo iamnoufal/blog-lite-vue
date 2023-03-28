@@ -41,6 +41,7 @@ export default Vue.component('user-list', {
         switch(res.status) {
           case 200:
             alert('You are following '+name);
+            document.getElementById('dismiss'+this.type+'Modal').click()
             break
           case 400:
             res.text().then(msg => alert(msg))
@@ -60,6 +61,7 @@ export default Vue.component('user-list', {
         switch(res.status) {
           case 200:
             alert('You are not following '+name+' anymore.');
+            document.getElementById('dismiss'+this.type+'Modal').click()
             break
           case 400:
             res.text().then(msg => alert(msg))

@@ -192,6 +192,7 @@ const User = {
         switch(res.status) {
           case 200:
             alert('You are following '+name);
+            this.following = true
             break
           case 400:
             res.text().then(msg => alert(msg))
@@ -211,6 +212,7 @@ const User = {
         switch(res.status) {
           case 200:
             alert('You are not following '+name+' anymore.');
+            this.following = false
             break
           case 400:
             res.text().then(msg => alert(msg))

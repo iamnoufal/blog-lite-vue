@@ -68,12 +68,6 @@ const Home = {
       }
     }).catch(err => this.$router.push('/login'))
   },
-  methods: {
-    logout: function() {
-      document.cookie = ''
-      window.location.href = '#/login'
-    }
-  },
   components: {
     'upload-post': () => import('../components/upload-post.js'),
     'navigation': () => import ('../components/navigation.js'),

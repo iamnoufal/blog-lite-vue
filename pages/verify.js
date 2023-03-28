@@ -22,8 +22,8 @@ const Verify = {
           case 200:
             res.text().then(msg => { 
               if (msg != "") {
-                alert(msg)
-                this.$router.back()
+                // alert(msg)
+                // this.$router.back()
               }
             })
             break;

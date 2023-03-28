@@ -16,10 +16,40 @@ const Profile = {
             <a href="#" class="text-black" data-bs-toggle="modal" data-bs-target="#Followers">{{ followers_list.length }} followers</a>
             <a href="#" class="text-black ms-3" data-bs-toggle="modal" data-bs-target="#Following">{{ following_list.length }} following</a>
           </div>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfile">Edit</button>
+          <div>
+            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#editProfile">Edit</button>
+            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#importContent">Import</button>
+            <button class="btn btn-light" @click="exportContent">Export</button>
+            <button class="btn btn-light" @click="deleteUser">Delete Account</button>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- edit profile modal -->
+    <div class="modal fade" id="importContent" tabindex="-1" aria-labelledby="importContentLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="importContentLabel">Import Content</h1>
+              <button type="button" class="btn-close" href="#/" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">  
+              <div class="mb-3 mx-3">
+                <label for="importFile" class="form-label">Upload JSON file</label>
+                <input class="form-control" type="file" id="importFile" >
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" href="#/" id='cancelImportContent' data-bs-dismiss="modal">Cancel</button>
+              <input type="submit" class="btn btn-primary" value="Import" @click.prevent="importContent" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- end of edit profile modal -->
 
     <!-- posts -->
     <div class="container-md px-0">
@@ -308,23 +338,62 @@ const Profile = {
       }, 1000)
     },
     deletePost: function(post_id) {
-      fetch('http://127.0.0.1:5000/api/post/'+post_id, {
-        method: 'DELETE',
-        credentials: 'include'
+      if (confirm("Are you sure you want to delete this posts?")) {
+        fetch('http://127.0.0.1:5000/api/post/'+post_id, {
+          method: 'DELETE',
+          credentials: 'include'
+        }).then(res => {
+          switch(res.status) {
+            case 200:
+              alert("Post deleted successfully")
+              document.getElementById(post_id+'-dismiss').click();
+              this.fetchData()
+            case 400:
+              res.text().then(msg => this.error = msg)
+              break;
+            case 401:
+              res.text().then(msg => this.error = msg)
+              break;
+          }
+        })
+      }
+    },
+    importContent: function() {
+      let file = document.getElementById('importFile').files[0]
+      let data = new FormData()
+      data.append('file', file)
+      fetch('http://127.0.0.1:5000/api/import', {
+        method: "POST",
+        body: data,
+        credentials: "include"
       }).then(res => {
-        switch(res.status) {
-          case 200:
-            alert("Post deleted successfully")
-            document.getElementById(post_id+'-dismiss').click();
-            this.fetchData()
-          case 400:
-            res.text().then(msg => this.error = msg)
-            break;
-          case 401:
-            res.text().then(msg => this.error = msg)
-            break;
+        if (res.status == 200) {
+          alert("File Uploaded successfully. You'll receive a mail once we're done with processing the import.")
+          document.getElementById('cancelImportContent').click()
+        }
+      }).catch(err => console.log(err))
+    },
+    exportContent: function() {
+      fetch('http://127.0.0.1:5000/api/export', {credentials: "include"}).then(res => {
+        if (res.status == 200) {
+          alert("You'll receive a mail once we're done with processing the export along with the JSON file.")
         }
       })
+    },
+    deleteUser: function() {
+      if (confirm("Are you sure you want to delete your account?")) {
+        fetch('http://127.0.0.1:5000/api/user', {method: "DELETE", credentials: "include"})
+          .then(res => {
+            if (res.status == 200) {
+              alert("Account deleted successfully!")
+              cookieStore.delete('Token')
+              cookieStore.delete('User')
+              this.$router.push('signup')
+            } else {
+              res.text().then(msg => alert(msg))
+            }
+          })
+      }
     },
   },
   components: {
