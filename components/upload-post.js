@@ -7,7 +7,7 @@ export default Vue.component('upload-post', {
         <form method="post" id="uploadpost">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="uploadPostLabel">Upload Post:</h1>
-            <button type="button" class="btn-close" href="#/" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" id="uploadPostCancel" class="btn-close" href="#/" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">  
             <div class="mb-3 mx-3">
@@ -26,7 +26,7 @@ export default Vue.component('upload-post', {
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" href="#/" data-bs-dismiss="modal">Cancel</button>
-            <input type="submit" class="btn btn-primary" value="Create Post" data-bs-dismiss="modal" @click.prevent="uploadPost" />
+            <input type="submit" class="btn btn-primary" value="Create Post" @click.prevent="uploadPost" />
           </div>
         </form>
       </div>
@@ -44,34 +44,43 @@ export default Vue.component('upload-post', {
   },
   methods: {
     uploadPost: function() {
-      const data = {
-        title: this.uploadTitle,
-        description: this.uploadDescription,
-        image: this.uploadImage,
+      if (this.uploadTitle!='' && this.uploadDescription!="" && this.uploadImage!="") {
+        const data = {
+          title: this.uploadTitle,
+          description: this.uploadDescription,
+          image: this.uploadImage,
+        }
+        fetch('http://127.0.0.1:5000/api/post', {
+          method: "POST",
+          body: JSON.stringify(data),
+          credentials: "include",
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(res => {
+          console.log(res)
+          switch (res.status) {
+            case 200:
+              alert("Post uploaded successfully")
+              window.location.reload()
+              break
+            case 401:
+              res.text().then(err => alert(err))
+              break
+            case 404:
+              res.text().then(err => alert(err))
+              break
+          }
+        })
+      } else {
+        if (this.uploadTitle=="") {
+          alert("Please provide valid title!")
+        } else if (this.uploadDescription=="") {
+          alert("Please provide valid Description")
+        } else {
+          alert("Please upload valid image")
+        }
       }
-      console.log(data)
-      fetch('http://127.0.0.1:5000/api/post', {
-        method: "POST",
-        body: JSON.stringify(data),
-        credentials: "include",
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(res => {
-        console.log(res)
-        switch (res.status) {
-          case 200:
-            alert("Post uploaded successfully")
-            window.location.reload()
-            break
-          case 401:
-            res.text().then(err => alert(err))
-            break
-          case 404:
-            res.text().then(err => alert(err))
-            break
-        }
-      })
     },
     imageUpload: function() {
       const el = document.getElementById("uploadImage");
